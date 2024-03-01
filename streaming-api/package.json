@@ -1,0 +1,20 @@
+{
+  "name": "streaming-api",
+  "version": "1.0.0",
+  "description": "A streaming API project for practicing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc websocket.ts && node websocket.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3",
+    "http": "^0.0.1-security",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24"
+  }
+}

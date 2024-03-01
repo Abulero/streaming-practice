@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [displayData, setData] = useState("");
+  const [locked, setLocked] = useState(false);
+  const socket = new WebSocket("ws://localhost:8080/");
+
+  let currentData = "";
+
+  socket.onmessage = ({ data }) => {
+    let socketData: string = data;
+
+    setLocked(true);
+
+    if (socketData.includes("[DONE]")) {
+      setLocked(false);
+
+      socketData = socketData.replace("[DONE]", "");
+    }
+
+    currentData += socketData;
+
+    setData(currentData);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="container">
+      <h1>Data Streaming</h1>
+      <p className="dataViewer">{displayData}</p>
+      <div className="button-container">
+        <button
+          className="streaming-button"
+          onClick={() => {
+            currentData = "";
+            socket.send("Start");
+          }}
+          disabled={locked}
+        >
+          {locked ? "Streaming..." : "Start data stream"}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button
+          className="streaming-button-red"
+          onClick={() => {
+            if (locked) {
+              socket.send("Stop");
+              setLocked(false);
+            } else {
+              currentData = "";
+              setData("");
+            }
+          }}
+        >
+          {locked ? "Stop" : "Clear"}
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
